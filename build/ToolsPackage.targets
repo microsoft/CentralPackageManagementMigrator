@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+    <!-- Copy everything the tool depends on -->
+    <PropertyGroup>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
+    <!-- Automatically include everything in its output directory -->
+    <PropertyGroup>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);GetToolPackageFiles</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <Target Name="GetToolPackageFiles" BeforeTargets="_GetPackageFiles">
+        <ItemGroup>
+            <PackageAdditionalFiles Include="$(OutputPath)**\*.dll;$(OutputPath)**\*.exe;$(OutputPath)**\*.exe.config" />
+
+            <TfmSpecificPackageFile Include="@(PackageAdditionalFiles)"
+                Exclude="$(OutputPath)$(TargetName)$(TargetExt)"
+                Pack="true"
+                PackagePath="tools\" />
+        </ItemGroup>
+    </Target>
+
+    <!-- Avoid NuGet including any dependencies for a tools package -->
+    <PropertyGroup>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    </PropertyGroup>
+
+</Project>

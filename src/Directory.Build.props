@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <!--
+    This file is imported by any project that imports Microsoft.Common.props
+    Which occurs by default in SDK style projects
+  -->
+
+  <PropertyGroup>
+    <SrcRoot>$(MSBuildThisFileDirectory.TrimEnd('\\'))</SrcRoot>
+    <RepoRoot>$(SrcRoot)\..</RepoRoot>
+    <BuildRoot>$(RepoRoot)\build</BuildRoot>
+  </PropertyGroup>
+
+  <!-- Project Defaults -->
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangName Condition="'$(LangName)' == ''">en-US</LangName>
+    <MinimumMSBuildVersion>17.3</MinimumMSBuildVersion>
+    <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+    <WarningLevel Condition="'$(WarningLevel)' == ''">4</WarningLevel>
+  </PropertyGroup>
+
+  <!-- C# Specific Properties -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <Deterministic>true</Deterministic>
+    <StyleCopAnalyzersEnabled Condition="'$(StyleCopAnalyzersEnabled)' == ''">true</StyleCopAnalyzersEnabled>
+    <IncludeSymbols>true</IncludeSymbols>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <LangVersion>Latest</LangVersion>
+    <UseHostCompilerIfAvailable Condition="'$(BuildingForLiveUnitTesting)' == 'true'">true</UseHostCompilerIfAvailable>
+    <!-- Disable transitive project references to avoid excessive sandboxing in large repos -->
+    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Standard Debug PropertyGroup from VS template -->
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+   <!-- Standard Release PropertyGroup from VS template -->
+  <PropertyGroup Condition=" '$(Configuration)' != 'Debug' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Versioning, see https://github.com/dotnet/Nerdbank.GitVersioning -->
+
+  <!-- General Attributes -->
+  <PropertyGroup>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>Copyright (c) Microsoft Corporation. All rights reserved.</Copyright>
+    <Authors>Microsoft</Authors>
+  </PropertyGroup>
+
+  <!-- Source Linking -->
+  <!-- Setup Instructions - https://github.com/dotnet/sourcelink/blob/main/README.md -->
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- Include PDBs if project is a dotnet tool -->
+    <AllowedOutputExtensionsInPackageBuildOutputFolder Condition="'$(IsTool)' == 'true'">$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+
+    <!-- Create Symbol package if not a dotnet tool-->
+    <IncludeSymbols Condition="'$(IsTool)' != 'true'">true</IncludeSymbols>
+    <SymbolPackageFormat Condition="'$(IsTool)' != 'true'">snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- SLNGEN -->
+  <ItemGroup>
+    <!-- Don't use GlobalPackageReference, doesn't work for Traversal projects -->
+    <PackageReference Include="Microsoft.VisualStudio.SlnGen" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.proj' Or '$(MSBuildProjectExtension)' == '.nuproj'">
+    <IncludeInSolutionFile>false</IncludeInSolutionFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SlnGenLaunchVisualStudio>true</SlnGenLaunchVisualStudio>
+    <SlnGenGlobalProperties>ExcludeRestorePackageImports=true;Platform=$(Platform)</SlnGenGlobalProperties>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SlnGenSolutionItem Include="$(SrcRoot)\Directory.Build.props" />
+    <SlnGenSolutionItem Include="$(SrcRoot)\Directory.Packages.props" />
+    <SlnGenSolutionItem Include="$(SrcRoot)\Directory.Build.targets" />
+    <SlnGenSolutionItem Include="$(SrcRoot)\global.json" />
+    <SlnGenSolutionItem Include="$(BuildRoot)\*.*" />
+  </ItemGroup>
+
+  <!-- NuGet Settings -->
+  <PropertyGroup>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    <PackageOutputPath>$(RepoRoot)\pkgOut</PackageOutputPath>
+  </PropertyGroup>
+
+</Project>
